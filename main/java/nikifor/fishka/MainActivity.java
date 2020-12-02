@@ -20,6 +20,7 @@ import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.CameraPosition;
 import com.yandex.mapkit.map.IconStyle;
 import com.yandex.mapkit.map.MapObject;
+import com.yandex.mapkit.map.MapObjectCollection;
 import com.yandex.mapkit.map.MapObjectTapListener;
 import com.yandex.mapkit.map.PlacemarkMapObject;
 import com.yandex.mapkit.mapview.MapView;
@@ -29,6 +30,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static java.lang.Math.round;
@@ -36,8 +39,20 @@ import static java.lang.Math.round;
 public class MainActivity extends AppCompatActivity {
 
     private MapView mapview;
+    private ArrayList<PlacemarkMapObject> placeList;
 
-    public Bitmap drawSimpleBitmap(String text, int textSize) {
+    MapObjectTapListener tapListener = new MapObjectTapListener() {
+        @Override
+        public boolean onMapObjectTap(@NonNull MapObject mapObject, @NonNull Point point) {
+
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    String.valueOf(mapObject.getUserData()) , Toast.LENGTH_SHORT);  //String.valueOf(point.getLatitude()) + ' ' + String.valueOf(point.getLongitude())
+            toast.show();
+            return true;
+        }
+    };
+
+    private Bitmap drawSimpleBitmap(String text, int textSize) {
         Paint paint = new Paint();
         paint.setTextSize(textSize);
 
@@ -66,6 +81,14 @@ public class MainActivity extends AppCompatActivity {
         return bitmap;
     }
 
+    private PlacemarkMapObject addPlaceMarker(Double pLant, Double pLong, String name) {
+        PlacemarkMapObject marker = mapview.getMap().getMapObjects().addPlacemark(new Point(pLant, pLong),
+                ImageProvider.fromBitmap(drawSimpleBitmap(name, 36)));
+        marker.setUserData(name);
+        marker.addTapListener(tapListener);
+        return marker;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try
@@ -85,6 +108,10 @@ public class MainActivity extends AppCompatActivity {
                 new Animation(Animation.Type.SMOOTH, 0),
                 null);
 
+        MapObjectCollection moc = mapview.getMap().getMapObjects();
+        placeList = new ArrayList<PlacemarkMapObject>();
+        placeList.clear();
+
         try {
             String result = new PostRequest().execute().get();
             //result = "{" + result + "}";
@@ -99,19 +126,24 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("lodg: ", lo);
 
 
-                        mapview.getMap().getMapObjects().addPlacemark(new Point(Double.parseDouble(place.getString("lant")),
-                                Double.parseDouble(place.getString("long"))),
-                        ImageProvider.fromBitmap(drawSimpleBitmap(place.getString("name"), 36))).addTapListener(
-                        new MapObjectTapListener() {
-                            @Override
-                            public boolean onMapObjectTap(@NonNull MapObject mapObject, @NonNull Point point) {
-                                Toast toast = Toast.makeText(getApplicationContext(),
-                                        String.valueOf(point.getLatitude()) + ' ' + String.valueOf(point.getLongitude()) , Toast.LENGTH_SHORT);
-                                toast.show();
-                                return true;
-                            }
-                        }
-                );
+                PlacemarkMapObject mark = addPlaceMarker(   Double.parseDouble(place.getString("lant")),
+                                                            Double.parseDouble(place.getString("long")),
+                                                            place.getString("name") );
+                placeList.add(mark);
+
+//                MapObjectTapListener tapListener = new MapObjectTapListener() {
+//                    @Override
+//                    public boolean onMapObjectTap(@NonNull MapObject mapObject, @NonNull Point point) {
+//                        Toast toast = Toast.makeText(getApplicationContext(),
+//                                String.valueOf(point.getLatitude()) + ' ' + String.valueOf(point.getLongitude()) , Toast.LENGTH_SHORT);
+//                        toast.show();
+//                        return true;
+//                    }
+//                };
+//                 moc.addPlacemark(new Point(Double.parseDouble(place.getString("lant")),
+//                        Double.parseDouble(place.getString("long"))),
+//                        ImageProvider.fromBitmap(drawSimpleBitmap(place.getString("name"), 36))).addTapListener(tapListener);
+
 
             }
 //            Log.d("------Request: ", v);
