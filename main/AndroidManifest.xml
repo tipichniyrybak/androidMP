@@ -10,14 +10,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fishka">
         <activity
-            android:name=".MainActivity"
-            >
+            android:name=".PlaceActivity"
+            android:label="@string/title_activity_place"
+            android:theme="@style/Theme.Fishka.NoActionBar"></activity>
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
     </application>
 

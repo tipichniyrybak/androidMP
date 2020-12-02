@@ -19,7 +19,7 @@ public class PostRequest extends AsyncTask<String, Void, String> {
 
         String json_response = "";
         try{
-            String url = "http://fishka.herokuapp.com/get_places/";
+            String url = args[0];
             URL urlObj = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
             conn.setDoOutput(true);

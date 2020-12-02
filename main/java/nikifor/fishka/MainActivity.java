@@ -3,6 +3,8 @@ package nikifor.fishka;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Application;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -40,14 +42,20 @@ public class MainActivity extends AppCompatActivity {
 
     private MapView mapview;
     private ArrayList<PlacemarkMapObject> placeList;
+    public static final String EXTRA_MESSAGE = "nikifor.fishka.placeName";
 
     MapObjectTapListener tapListener = new MapObjectTapListener() {
         @Override
         public boolean onMapObjectTap(@NonNull MapObject mapObject, @NonNull Point point) {
 
-            Toast toast = Toast.makeText(getApplicationContext(),
-                    String.valueOf(mapObject.getUserData()) , Toast.LENGTH_SHORT);  //String.valueOf(point.getLatitude()) + ' ' + String.valueOf(point.getLongitude())
-            toast.show();
+//            Toast toast = Toast.makeText(getApplicationContext(),
+//                    String.valueOf(mapObject.getUserData()) , Toast.LENGTH_SHORT);  //String.valueOf(point.getLatitude()) + ' ' + String.valueOf(point.getLongitude())
+//            toast.show();
+
+            Intent intent = new Intent(getApplicationContext(), PlaceActivity.class);
+            intent.putExtra(EXTRA_MESSAGE, String.valueOf(mapObject.getUserData()));
+            startActivity(intent);
+
             return true;
         }
     };
@@ -113,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         placeList.clear();
 
         try {
-            String result = new PostRequest().execute().get();
+            String result = new PostRequest().execute("http://fishka.herokuapp.com/get_places/").get();
             //result = "{" + result + "}";
             Log.d("result: ", result);
             //JSONObject places = new JSONObject(result);
