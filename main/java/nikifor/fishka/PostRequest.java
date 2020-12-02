@@ -19,6 +19,7 @@ public class PostRequest extends AsyncTask<String, Void, String> {
 
         String json_response = "";
         try{
+            Log.e("--------url---------  ", args[0]);
             String url = args[0];
             URL urlObj = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
